@@ -1,7 +1,7 @@
 # -*- coding: UTF-8
 import urwid
 from urwid import raw_display
-import leftBox 
+import leftBox
 import mbox
 
 screenCols, screenRows = raw_display.Screen().get_cols_rows()
@@ -11,7 +11,7 @@ class WechatMain(object):
         self.contactButton = urwid.Button("contact")
         self.sendButton = urwid.Button("send")
         self.inputBox = urwid.Edit(multiline=True)
-        self.current_chat_from="" 
+        self.current_chat_from=""
         self.owner_id=""
         self.palette=palette
         self.loop=None
@@ -40,7 +40,7 @@ class WechatMain(object):
         urwid.connect_signal(self.chatButton,'click',self.on_chat_button_click)
         urwid.connect_signal(self.contactButton,'click',self.on_contact_button_click)
         topLeft = urwid.Columns([wrapedChatButton,wrapedContactButton],dividechars=1)
-        bottomLeft = urwid.BoxAdapter(self.chatListBox,screenRows-3) 
+        bottomLeft = urwid.BoxAdapter(self.chatListBox,screenRows-3)
         return urwid.Pile([topLeft,bottomLeft])
     def createRight(self):
         wrapedInputEdit = wrapEdit(self.inputBox)
@@ -57,20 +57,21 @@ class WechatMain(object):
         self.chatListBox.show_contact()
     def on_send_button_click(self,button):
         text = self.inputBox.edit_text
-        self.send_message_to(text,self.owner_id,self.current_chat_from) 
+        self.send_message_to(text,self.owner_id,self.current_chat_from)
     def send_message_to(self,text,fromUserName,toUserName):
         if text=="":
-            return 
+            return
         if self.current_chat_from in [None,""]:
             return
         self.recive_message(create_msg(fromUserName,toUserName,text),self.currentchat_name)
         self.itchat.send(text,toUserName)
         self.inputBox.set_edit_text("")
     def set_current_chat(self,chat_id,chat_name):
-        self.current_chat_from =chat_id 
+        self.current_chat_from =chat_id
         self.currentchat_name = chat_name
         self.chat_name.set_text(chat_name)
         msgList = self.chatListBox.get_chat_message(chat_id)
+        self.chatListBox.mark_as_read(chat_id)
         self.messageListBox.bindList(msgList)
         self.loop.draw_screen()
     def recive_message(self,msg,chat_name,is_group=False):
