@@ -1,8 +1,9 @@
 # -*- coding: UTF-8
 import urwid
+unreadSign = "🆕 "
 class ChatListBox(urwid.ListBox):
     def __init__(self,userName,contact_click_fn,chat_click_fn,contactList,is_contact_list=False):
-        self.contactList=contactList 
+        self.contactList=contactList
         self.chatList={}
         self.chat_name_dic={}
         self.owner=userName
@@ -26,18 +27,21 @@ class ChatListBox(urwid.ListBox):
         for contact in self.contactList:
             self.addcontacts(contact,self.contact_click_fn)
     def addNewChat(self,chat_id,chat_name,unread=False):
-        self.chat_name_dic[chat_id]=chat_name
+        self.chat_name_dic[chat_id]=unreadSign+chat_name
+        self.show_chat()
         if not chat_id in self.chatList:
             self.chatList[chat_id]=[]
             self.insert_new_line(chat_id,chat_name,unread)
     def add_chat_by_msg(self,chat_id,chat_name,msg,unread=False):
-        self.chat_name_dic[chat_id]=chat_name
+        self.chat_name_dic[chat_id]=unreadSign+chat_name
         if chat_id in self.chatList :
             self.chatList[chat_id].append(msg)
+            self.show_chat()
             return
         else:
             self.chatList[chat_id]=[msg]
             self.insert_new_line(chat_id,chat_name,unread)
+            self.show_chat()
     def insert_new_line(self,chat_id,chat_name,unread):
         if self.is_contact_list:
             return
@@ -56,7 +60,9 @@ class ChatListBox(urwid.ListBox):
             return self.chatList[chat_id]
         else:
             return []
-
+    def mark_as_read(self,chat_id):
+        self.chat_name_dic[chat_id]=self.chat_name_dic[chat_id].replace(unreadSign,'')
+        self.show_chat()
     def addcontacts(self,contact,clickFun):
         name = ''
         if contact['UserName']==self.owner:
